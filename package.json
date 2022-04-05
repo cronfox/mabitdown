@@ -1,0 +1,15 @@
+{
+  "name": "mabitdown",
+  "version": "0.0.1",
+  "description": "Mabinogi File downloader",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "amitamabi",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "superagent": "^7.1.1"
+  }
+}
