@@ -3,39 +3,10 @@ const child_process = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const util = require('util');
-const _ = require('lodash');
-Promise.allLimit = function (arr, wrap, limit, callback) {
-	return new Promise((resolve, reject) => {
-		var total = arr.length;
-		var result = [];
-		var rejected = false;
-		var dones = 0;
-		function run(n) {
-			setTimeout(() => {
-				wrap(n, arr.shift()).then(res => (typeof callback === 'function' ? callback(n, res) : Promise.resolve(res))).then((res) => {
-					dones += 1;
-					result.push(res);
-					if (!rejected) {
-						if (arr.length) {
-							run(total - arr.length);
-						} else if (dones === total) {
-							resolve(result);
-						}
-					}
-					
-				}).catch((err) => {
-					rejected = true;
-					reject(err);
-				});
-			}, 0);
-		}
-		arr.slice(0, limit).forEach((v, n) => {
-			run(n);
-		});
-	});
-};
 
+const _ = require('lodash');
+const utils = require('./utils');
+Promise.allLimit = utils.AllLimit
 
 void async function () {
     //get filename list from disk
@@ -44,7 +15,6 @@ void async function () {
     filelist.forEach(e => {
         fileArray.push(e)
     })
-    //"只要把这鬼玩意的关键性能问题解决掉就好了" -hina
     let f
     if(fs.existsSync('mabi-pack2.exe') || fs.existsSync('./mabi-pack2')){
         f = await Promise.allLimit(fileArray, warpGetITPackFileList, 4)
@@ -74,13 +44,12 @@ async function warpGetITPackFileList(n,filename){
 
 function getITPackFileList(filePath){
     return new Promise((resolve,reject)=>{
-        //依我看 关键的性能问题就出在这这里了 -hina
         let a
         if(filePath.endsWith('undefined')){
             reject()
         }
+        console.log(`Listing ${filePath}`)
         if(fs.existsSync('mabi-pack2.exe') || fs.existsSync('./mabi-pack2')){
-            //有原生二进制文件还是尽量用原生二进制吧 -hina
             if(process.platform == "win32"){
                 a = child_process.spawn(
                     'mabi-pack2.exe',
