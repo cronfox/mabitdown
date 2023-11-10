@@ -70,6 +70,7 @@ if (isMainThread) {
         //get cpu count
         const cpuCount = require('os').cpus().length;
         let result = []
+        fs.mkdirSync(path.join(__dirname, './package'), { recursive: true })
         for (let i = 0; i < cpuCount; i++) {
             let worker = new Worker(__filename, { workerData: { fileArray: fileArray, id: i } })
                 .on('message', (message) => {
