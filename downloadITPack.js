@@ -14,7 +14,7 @@ void async function () {
     itFileArray = _.sortBy(itFileArray, ['path'])
     //console.log(itFileArray[1])
     //download *.it files
-    await Promise.allLimit(itFileArray, DownloadFile, 16)
+    await Promise.allLimit(itFileArray, DownloadFile,6)
 }()
 
 async function DownloadFile(n,DownloadURLObject) {
