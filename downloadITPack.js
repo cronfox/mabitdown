@@ -40,15 +40,24 @@ async function DownloadFile(n,DownloadURLObject) {
     }
     //console.log(path.dirname(path.join(__dirname,"./download",DownloadURLObject.path)))
     mkdirp(path.join(__dirname,"./download",DownloadURLObject.path))
-    try{
-        let fileStream = fs.createWriteStream(path.join(__dirname,"./download",DownloadURLObject.path))
-        let iStream = request.get(DownloadURLObject.url).retry(10)
-        await pipeline(iStream,fileStream);
-    }catch(e){
-        let fileStream = fs.createWriteStream(path.join(__dirname,"./download",DownloadURLObject.path))
-        let iStream = request.get(DownloadURLObject.url).retry(10)
-        await pipeline(iStream,fileStream);
+    let final = false,retry = 0
+    
+    while(!final){
+        try{
+            let fileStream = fs.createWriteStream(path.join(__dirname,"./download",DownloadURLObject.path))
+            let iStream = request.get(DownloadURLObject.url).retry(10)
+            await pipeline(iStream,fileStream);
+            final = true
+        }catch(e){
+            console.error(e)
+            retry++
+            if(retry > 10){
+                throw "err"
+            }
+            continue
+        }
     }
+
     let hash = crypto.createHash('md5');
     hash.setEncoding('hex');
     await pipeline(fs.createReadStream(path.join(__dirname,"./download",DownloadURLObject.path)),hash)
