@@ -9,7 +9,7 @@ void async function () {
     let DownloadURLObjectArray = await utils.getDownloadArray()
     //filter *.it files
     let itFileArray = DownloadURLObjectArray.filter(e => e.path.endsWith('.it'))
-    console.log(itFileArray)
+    //console.log(itFileArray)
     //sort array by path
     itFileArray = _.sortBy(itFileArray, ['path'])
     //console.log(itFileArray[1])
