@@ -49,7 +49,7 @@ function exactITPack(filePath){
         }else{
             a = child_process.spawn(
                 'node',
-                ['--experimental-wasi-unstable-preview1','mabiPackWASICaller.js',...param]
+                ['extract-nmit.js',...param]
             )
         } 
         let returnData =[]

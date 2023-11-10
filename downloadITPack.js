@@ -12,6 +12,7 @@ void async function () {
     console.log(itFileArray)
     //sort array by path
     itFileArray = _.sortBy(itFileArray, ['path'])
+    //console.log(itFileArray[1])
     //download *.it files
     await Promise.allLimit(itFileArray, DownloadFile, 16)
 }()
@@ -26,7 +27,7 @@ async function DownloadFile(n,DownloadURLObject) {
         hash.setEncoding('hex');
         await pipeline(fs.createReadStream(path.join(__dirname,"./download",DownloadURLObject.path)),hash)
         let fhash = hash.digest('hex')
-        if(fhash.toLocaleUpperCase() == DownloadURLObject.hash.toLocaleUpperCase()){
+        if(fhash == DownloadURLObject.hash){
             console.log(`FILE CACHE BYPASS: OHASH=${DownloadURLObject.hash},URL=${DownloadURLObject.url},FPATH=${DownloadURLObject.path}`)
             return 
         }else{

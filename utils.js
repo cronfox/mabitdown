@@ -8,24 +8,23 @@ async function getDownloadArray(){
     let DownloadURLObjectArray = []
     fileArray.forEach(e => {
         DownloadURLObjectArray.push({
-            url: `http://cdnpatch.luoqi.com.cn/${e[3]}/${e[0]}`,
+            //url: `http://cdnpatch.luoqi.com.cn/${e[3]}/${e[0]}	`,
             path: e[0],
             size: e[1],
             hash: e[2],
             version: e[3]
         })
     })
+	let maxVer = getDownloadURLObjectArrayMaxVersion(DownloadURLObjectArray)
+	DownloadURLObjectArray = DownloadURLObjectArray.map((e)=>{
+		e.url = `http://cdnpatch.luoqi.com.cn/${e.version<(Math.floor(maxVer/10)*10 +1)?Math.floor(maxVer/10)+"1":e.version}/${e.path}`
+		return e
+	})
+	console.log(maxVer)
     return DownloadURLObjectArray
 }
 function getDownloadURLObjectArrayMaxVersion(DownloadURLObjectArray) {
-    var al = DownloadURLObjectArray.length;
-    maximum = DownloadURLObjectArray[al - 1].version;
-    while (al--) {
-        if (DownloadURLObjectArray[al].version > maximum) {
-            maximum = DownloadURLObjectArray[al].version
-        }
-    }
-    return maximum;
+    return DownloadURLObjectArray.map(e=>e.version).sort((a,b)=>b-a)[0]
 };
 AllLimit = function (arr, wrap, limit, callback) {
 	return new Promise((resolve, reject) => {
