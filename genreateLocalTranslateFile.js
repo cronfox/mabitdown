@@ -14,6 +14,9 @@ let filelist = fs.readdirSync(path.join(__dirname, './data/local/xml'))
 let translated = {
     xml:{}
 }
+let translatedO = {
+    xml:{}
+}
 
 filelist.forEach(e=>{
     let filepath = path.join(__dirname, './data/local/xml/' + e)
@@ -26,17 +29,22 @@ filelist.forEach(e=>{
         return e.startsWith("\x00")
     })
     let objectname = e.split(".")[0]
-    translated.xml[objectname] = []
+    let translatedArray = []
+    //translated.xml[objectname] = []
     filecontentArray.forEach(e=>{
         let eArray = e.split('\t')
-        translated.xml[objectname][parseInt(eArray[0])] = eArray[1];
+        translatedArray[parseInt(eArray[0])] = eArray[1];
     })
     if(!fs.existsSync(path.join(__dirname, './translate/xml/'))){
         fs.mkdirSync(path.join(__dirname, './translate/xml/'),{recursive:true})
     }
     console.log(`Converting ./data/local/xml/${e} to JSON ./translate/xml/${objectname}.json ...`)
-    fs.writeFileSync(path.join(__dirname, './translate/xml', objectname + '.json'), JSON.stringify({data:translated.xml[objectname]}))
+    fs.writeFileSync(path.join(__dirname, './translate/xml', objectname + '.json'), JSON.stringify({data:translatedArray}))
+    translated["xml"][objectname.toLowerCase()] = translatedArray
+    translatedO["xml"][objectname] = translatedArray
 })
 
+console.log(`Writing Bundle+lowercase key JSON ./translate/translate.xml.all.lower.json ...`)
+fs.writeFileSync(path.join(__dirname, './translate/translate.xml.all.lower.json'), JSON.stringify(translated))
 console.log(`Writing Bundle JSON ./translate/translate.xml.all.json ...`)
-fs.writeFileSync(path.join(__dirname, './translate/translate.xml.all.json'), JSON.stringify(translated))
+fs.writeFileSync(path.join(__dirname, './translate/translate.xml.all.json'), JSON.stringify(translatedO))

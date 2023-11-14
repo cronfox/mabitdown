@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.21",
-    "superagent": "^7.1.1"
+    "superagent": "^7.1.1",
+    "xml2js": "^0.6.2"
   }
 }

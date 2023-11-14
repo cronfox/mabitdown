@@ -8,7 +8,7 @@ const {
     Worker, isMainThread, parentPort, workerData,
 } = require('worker_threads');
 
-
+const threadCount = 16;
 /**
  * 
  * @param {RawFileEntry} entires 
@@ -71,7 +71,7 @@ if (isMainThread) {
         const cpuCount = require('os').cpus().length;
         let result = []
         fs.mkdirSync(path.join(__dirname, './package'), { recursive: true })
-        for (let i = 0; i < cpuCount; i++) {
+        for (let i = 0; i < threadCount; i++) {
             let worker = new Worker(__filename, { workerData: { fileArray: fileArray, id: i } })
                 .on('message', (message) => {
                     console.log(message.filename,message.packedFiles.length,"files")
@@ -91,13 +91,16 @@ if (isMainThread) {
     const { fileArray, id } = workerData;
     //console.log(fileArray)
     //console.log(id)
-    const cpuCount = require('os').cpus().length;
     for (let i = 0; i < fileArray.length; i++) {
-        if (i % cpuCount == id) {
+        if (i % threadCount == id) {
             let filePath = fileArray[i]
             let fileBuffer = new Uint8Array(fs.readFileSync(filePath))
+            let hash = {
+                "md5": require("crypto").createHash("md5").update(fileBuffer).digest("hex"),
+                "sha256": require("crypto").createHash("sha256").update(fileBuffer).digest("hex")
+            }
             let result = getEntires(path.basename(filePath), fileBuffer)
-            parentPort.postMessage({ filename: path.basename(filePath), packedFiles: result.map(e => e.name) })
+            parentPort.postMessage({ filename: path.basename(filePath), packedFiles: result.map(e => e.name) ,hash})
             //console.log(path.basename(filePath), result.length, "files")
             extractFileFromRFE(exactFilesFromBufferFilter(path.basename(filePath), fileBuffer, [/.xml/, /.txt/]))
         }
