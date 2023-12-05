@@ -60,6 +60,9 @@ if (isMainThread) {
         filelist.forEach(e => {
             fileArray.push(path.join(__dirname, './download/package', e))
         })
+        if (!fs.existsSync(path.join(__dirname, './entires'))) {
+            fs.mkdirSync(path.join(__dirname, './entires'), { recursive: true })
+        }
         //fileArray.forEach(filePath => {
         //    let fileBuffer = new Uint8Array(fs.readFileSync(filePath))
         //    //console.log(path.basename(filePath))
@@ -74,8 +77,10 @@ if (isMainThread) {
         for (let i = 0; i < threadCount; i++) {
             let worker = new Worker(__filename, { workerData: { fileArray: fileArray, id: i } })
                 .on('message', (message) => {
-                    console.log(message.filename,message.packedFiles.length,"files")
-                    fs.writeFileSync(path.join(__dirname, './package', message.filename + ".json"), JSON.stringify(message))
+                    let { filename, packedFiles, hash } = message
+                    console.log(message.filename, message.packedFiles.length, "files")
+                    fs.writeFileSync(path.join(__dirname, './package', message.filename + ".json"), JSON.stringify({ filename, packedFiles: packedFiles.map(e => e.name), hash }))
+                    fs.writeFileSync(path.join(__dirname, './entires', message.filename + ".json"), JSON.stringify({ filename, packedFiles, hash }))
                 })
                 .on('error', (err) => { throw err; })
                 .on('exit', () => {
@@ -100,7 +105,7 @@ if (isMainThread) {
                 "sha256": require("crypto").createHash("sha256").update(fileBuffer).digest("hex")
             }
             let result = getEntires(path.basename(filePath), fileBuffer)
-            parentPort.postMessage({ filename: path.basename(filePath), packedFiles: result.map(e => e.name) ,hash})
+            parentPort.postMessage({ filename: path.basename(filePath), packedFiles: JSON.parse(JSON.stringify(result)), hash })
             //console.log(path.basename(filePath), result.length, "files")
             extractFileFromRFE(exactFilesFromBufferFilter(path.basename(filePath), fileBuffer, [/.xml/, /.txt/]))
         }
