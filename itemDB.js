@@ -23,7 +23,10 @@ async function extractItemDB() {
         })
         console.log(iterator,itemdb.size)
     }
-    fs.writeFileSync("itemdb.json",JSON.stringify(Array.from(itemdb.values()),null,2))
+    if(!fs.existsSync("db")){
+        fs.mkdirSync("db")
+    }
+    fs.writeFileSync("db/itemdb.json",JSON.stringify(Array.from(itemdb.values()),null,2))
 }
 
 /**
