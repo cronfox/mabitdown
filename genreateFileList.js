@@ -5,6 +5,9 @@ let fileArray = []
 filelist.forEach(e => {
     fileArray.push(path.join(__dirname, './package', e))
 })
+if (!fs.existsSync(path.join(__dirname, './packageListText'))) {
+    fs.mkdirSync(path.join(__dirname, './packageListText'), { recursive: true })
+}
 fileArray = fileArray.map(e=>JSON.parse(fs.readFileSync(e)))
 fileArray.forEach((e)=>{
     let textformat = []
