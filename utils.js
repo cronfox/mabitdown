@@ -17,7 +17,7 @@ async function getDownloadArray(){
     })
 	let maxVer = getDownloadURLObjectArrayMaxVersion(DownloadURLObjectArray)
 	DownloadURLObjectArray = DownloadURLObjectArray.map((e)=>{
-		e.url = `http://cdnpatch.luoqi.com.cn/${e.version<(Math.floor(maxVer/10)*10 +1)?Math.floor(maxVer/10)+"1":e.version}/${e.path}`
+		e.url = `http://cdnpatch.luoqi.com.cn/${getURLVersion(e.version,maxVer)}/${e.path}`
 		return e
 	})
 	console.log(maxVer)
@@ -26,6 +26,19 @@ async function getDownloadArray(){
 function getDownloadURLObjectArrayMaxVersion(DownloadURLObjectArray) {
     return DownloadURLObjectArray.map(e=>e.version).sort((a,b)=>b-a)[0]
 };
+//文件版本，目前最大版本
+function getURLVersion(fileVersion,maxVersion){
+	let urlVersion
+	if(maxVersion%10==0){ //如果版本号是10的倍数
+		//如果e.version小于 Math.floor(maxVersion/10-1)*10+1 则urlVersion = Math.floor(maxVersion/10-1)*10+1
+		urlVersion = fileVersion < Math.floor(maxVersion/10-1)*10+1 ? Math.floor(maxVersion/10-1)*10+1 : fileVersion
+	}else{
+		//如果e.version小于 Math.floor(maxVersion/10)*10+1 则urlVersion = Math.floor(maxVersion/10)*10+1
+		urlVersion = fileVersion < Math.floor(maxVersion/10)*10+1 ? Math.floor(maxVersion/10)*10+1 : fileVersion
+	}
+	return urlVersion
+}
+
 AllLimit = function (arr, wrap, limit, callback) {
 	return new Promise((resolve, reject) => {
 		var total = arr.length;
